@@ -211,7 +211,7 @@ zenith instances resize "$VENDOR" "$PROVIDER_ID" \
 | `listMyObjectSources` | `zenith storage sources` | `storage:read` | 已实现；可按项目筛选已授权来源。 |
 | `listMyObjects` | `zenith storage objects` | `storage:read` | 已实现；按来源列出一页相对对象，支持游标。 |
 | `presignMyObjectUpload` | `zenith storage upload-presign` | `storage:write` | 已实现；需 --yes，将上传 URL 写入新建私有文件，不传文件。 |
-| `presignMyObjectDownload` | `zenith storage download-presign` | `storage:read` | 已实现；将下载 URL 写入新建私有文件，不传文件。 |
+| `presignMyObjectDownload` | 已撤出个人 API（4.0.0），无 CLI 命令 | `storage:read` 不再包含下载 | 脚本请用 `zenith storage sts` 取得整桶临时凭据后直接从 TOS/BOS 下载；拿不到 STS 的授权请在网页控制台下载。 |
 | `issueMyBucketSts` | `zenith storage sts` | `storage:read` + `storage:write` + `storage:sts` | 已实现；整桶读写授权，需 --yes；凭据写入新建 0600 文件，不输出明文。 |
 | `getDevMachineById` | `zenith instances get-by-id` | `instances:read` | 规划中；HTTP 可按 Platform ID 读取开发机。 |
 | `startDevMachineById` | `zenith instances start-by-id` | `instances:start` | 规划中；HTTP 可按 Platform ID 启动本人开发机。 |

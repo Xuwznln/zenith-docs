@@ -139,19 +139,23 @@ zenith storage list --output json
 
 资源区1–4 个人存储和项目存储的专属空间与挂载契约仍待厂商正式确认，已分配或项目已绑定不代表可以挂载。自动个人、项目与公共存储挂载仍受限制，不会回退挂载整个底层存储根。当前存储操作说明见[文件与存储](/data/storage)。
 
-### Authorized object upload and download
+### Authorized object upload and listing
 
-API **2.7.0** adds four HTTP operations for existing authorized object-storage bindings:
+API **2.7.0** added HTTP operations for existing authorized object-storage bindings. Download
+signing was withdrawn in API **4.0.0**:
 
 | Operation                | Endpoint                                  | Scope           |
 | ------------------------ | ----------------------------------------- | --------------- |
 | Discover logical sources | `GET /pt/api2/ai/files/sources`           | `storage:read`  |
 | List relative objects    | `GET /pt/api2/ai/files/objects`           | `storage:read`  |
 | Sign one upload          | `POST /pt/api2/ai/files/presign`          | `storage:write` |
-| Sign one download        | `POST /pt/api2/ai/files/download-presign` | `storage:read`  |
 
-Existing tokens with `storage:read` now gain object listing and download access within their
-current project/public bindings. Upload requires a replacement token explicitly granted
+`POST /pt/api2/ai/files/download-presign` now returns **410** `download_presign_withdrawn`. To
+download objects from a script, issue whole-bucket temporary credentials (`storage sts`, below) and
+use a TOS/BOS client directly. Grants that cannot issue them (prefix-only, read-only, directory or
+viewer access) download in the web console.
+
+Tokens with `storage:read` can list objects within their current project/public bindings. Upload requires a replacement token explicitly granted
 `storage:write`, a current platform role of 普通用户 (`operator`) or above and a writable source; project viewers stay read-only.
 No personal bucket is created. An empty source list means no currently authorized object binding.
 
@@ -183,9 +187,8 @@ file storage or make a training dataset ready.
 409 means unsupported provider capability; 502 means unusable provider output; 503 means a
 currently unavailable dependency. Follow the current OpenAPI schemas and preserve these errors.
 
-The generated HTTP client supports all four operations, and the CLI implements them as `storage sources`,
-`storage objects`, `storage upload-presign` and `storage download-presign` (whole-bucket temporary credentials are
-`storage sts`). `storage list` still lists assigned mount disks. Console proxy/file, mounted file storage, delete and
+The generated HTTP client supports these operations, and the CLI implements them as `storage sources`,
+`storage objects` and `storage upload-presign` (whole-bucket temporary credentials are `storage sts`). `storage list` still lists assigned mount disks. Console proxy/file, mounted file storage, delete and
 raw provider routes remain unavailable to personal tokens.
 
 ### HTTP instance-ID aliases
@@ -692,7 +695,8 @@ session_token。仅在实际调用存储 SDK 的进程中读取这三个值，�
 撤销 Token/项目绑定可阻止后续签发，但已签发云凭据仍可能有效至到期。
 
 CLI 支持 `projects list/get`、`storage sources/objects`、`storage upload-presign`、
-`storage download-presign`、`storage sts`。签名 URL 用 `--capability-file` 保存，临时凭据用
+`storage sts`。脚本下载对象请用临时凭据直接访问 TOS/BOS（下载签名已于 4.0.0 撤下）；
+拿不到临时凭据的授权请在网页控制台下载。签名 URL 用 `--capability-file` 保存，临时凭据用
 `--credentials-file` 保存；文件必须新建，权限为 0600。上传签名和临时凭据签发还需 `--yes`。
 终端只显示结果元信息，不显示临时凭据；请求不会自动重试。
 
