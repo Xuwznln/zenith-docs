@@ -393,9 +393,12 @@ curl --fail-with-body -X POST \
 | `project_id`                                      | 所有账号均可省略，创建个人任务；选择项目时须有当前写入权限。                                                             |
 | `replicas`                                        | 默认 1。总卡数是所选平台规格卡数 × 副本数。                                                                              |
 | `envs`、`description`                             | 可选。环境变量最多 64 个，每个值最多 4096 字符。                                                                         |
-| `mount_personal`、`mount_project`、`mount_public` | 可选的初始挂载意图；省略使用平台默认，只能访问已有授权范围。                                                             |
+| `mount_personal` | 传布尔值 `false` 可让本次训练不带个人存储；省略沿用已有权限下的默认挂载。普通用户和个人 Token 均可使用 `false`。 |
+| `mount_project`、`mount_public` | 普通用户和个人 Token 应省略，由平台按权限自动配置；显式覆盖和 `mount_personal: true` 仍限管理员。 |
 | `mount_disk_ids`                                  | 可选，选择已获个人授权的附加挂载盘或已发布数据集，必须同资源区。个人盘按授权读写，数据集强制只读；路径由平台登记决定。   |
 | `booking_id`                                      | 可选，使用符合当前条件的已确认项目预约。                                                                                 |
+
+API 4.3.0 起，在提交 JSON 中增加 `"mount_personal": false` 即可关闭个人存储，资源区 10 同样支持。它只影响新任务的自动个人挂载，不删除已有文件，也不关闭项目、公共、数据集或另行选择的授权目录。复制任务及同一幂等键的重试保留该选择；CLI 的训练创建命令仍为规划状态，请直接使用 HTTP 接口。
 
 平台负责原生队列、规格、存储身份和调度参数。不接受 `queue_id`、`flavor_id`、`priority`、`preemptible`、原始挂载路径或所有者覆盖。`image_vendor`、`framework` 保留为高级兼容字段，新接入通常应省略；省略 `framework` 使用平台默认工作负载映射，训练依赖仍由镜像和命令提供。
 

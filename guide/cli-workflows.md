@@ -198,7 +198,7 @@ zenith instances resize "$VENDOR" "$PROVIDER_ID" \
 | `renameDatasetFile` | `zenith datasets rename` | `datasets:write` | 规划中；HTTP 数据集接口已可用，CLI 不发送请求。 |
 | `deleteDatasetFile` | `zenith datasets delete` | `datasets:write` | 规划中；HTTP 数据集接口已可用，CLI 不发送请求。 |
 | `createDevMachine` | `zenith instances create` | `instances:create` | 规划中；HTTP 可创建并开机，CLI 不发送请求。 |
-| `createTrainingJob` | `zenith jobs create` | `jobs:create` | 规划中；HTTP 可提交训练，CLI 不发送请求。 |
+| `createTrainingJob` | `zenith jobs create` | `jobs:create` | 规划中；HTTP 可提交训练，API 4.3.0 起可传 `mount_personal: false` 不带个人存储；CLI 不发送请求。 |
 | `listTrainingJobs` | `zenith jobs list` | `jobs:read` | 规划中；HTTP 可列出本人任务，CLI 不发送请求。 |
 | `getTrainingJob` | `zenith jobs get` | `jobs:read` | 规划中；HTTP 可读取本人任务，CLI 不发送请求。 |
 | `cancelTrainingJob` | `zenith jobs cancel` | `jobs:cancel` + `operations:read` | 已实现；取消本人任务，保留历史、日志与存储。 |
