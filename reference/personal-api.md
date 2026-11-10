@@ -678,17 +678,19 @@ Token 选择 `projects:read` 后，`GET /pt/api2/projects` 返回本人加入的
 `POST /pt/api2/ai/files/bucket-sts` 的请求体为：
 
 ```json
-{ "source_id": "绑定ID", "duration_seconds": 900 }
+{ "source_id": "存储来源ID", "duration_seconds": 900 }
 ```
 
 必须同时选择 `storage:read`、`storage:write`、`storage:sts`，账号具有操作权限，且当前
-绑定授予整桶读写。支持资源区5 和资源区10 的存储桶；项目角色为只读的成员、目录授权和只读授权不能申请整桶凭据。
+来源授予读写权限。支持资源区5 和资源区10 的存储桶及目录；项目角色为只读的成员和只读授权不能申请此类读写凭据。
+API 4.4.0 起，开启成员目录限制后，可从来源列表选择个人目录或 `public` 对应的 `source_id` 分别签发；每次只对应一个来源，不接受自行指定目录或策略。
 默认 900 秒，允许 900–43200 秒；Token 至少还需有请求时长加 60 秒的有效期。旧 Token
 不会自动获得 `storage:sts`，请创建包含所需权限的替代 Token。
 
 成功响应包括桶名、区域、端点、到期时间，以及临时 access_key_id、secret_access_key、
 session_token。仅在实际调用存储 SDK 的进程中读取这三个值，不要输出到日志或 AI 对话。
-可列举、上传、下载、覆盖以及分片上传；不能删对象、建删桶、修改 ACL 或项目绑定。
+`path_prefix` 表示授权目录（空字符串表示整桶），SDK 对象路径必须包含此前缀。可在授权范围内上传、下载、覆盖以及分片上传；不能删对象、建删桶、修改 ACL 或项目绑定。
+`can_list` 表示凭据能否列举文件。资源区5 的目录凭据须带授权前缀列举；资源区10 的目录凭据返回 `false`，文件列表通过平台的 `listMyObjects` 接口获取。整桶凭据保留原有列举能力。
 撤销 Token/项目绑定可阻止后续签发，但已签发云凭据仍可能有效至到期。
 
 CLI 支持 `projects list/get`、`storage sources/objects`、`storage upload-presign`、

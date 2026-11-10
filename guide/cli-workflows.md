@@ -212,7 +212,7 @@ zenith instances resize "$VENDOR" "$PROVIDER_ID" \
 | `listMyObjects` | `zenith storage objects` | `storage:read` | 已实现；按来源列出一页相对对象，支持游标。 |
 | `presignMyObjectUpload` | `zenith storage upload-presign` | `storage:write` | 已实现；需 --yes，将上传 URL 写入新建私有文件，不传文件。 |
 | `presignMyObjectDownload` | `zenith storage download-presign` | `storage:read` | 已实现；将下载 URL 写入新建私有文件，不传文件。 |
-| `issueMyBucketSts` | `zenith storage sts` | `storage:read` + `storage:write` + `storage:sts` | 已实现；整桶读写授权，需 --yes；凭据写入新建 0600 文件，不输出明文。 |
+| `issueMyBucketSts` | `zenith storage sts` | `storage:read` + `storage:write` + `storage:sts` | 已实现；按所选桶或目录的读写授权签发，需 --yes；凭据写入新建 0600 文件，不输出明文。 |
 | `getDevMachineById` | `zenith instances get-by-id` | `instances:read` | 规划中；HTTP 可按 Platform ID 读取开发机。 |
 | `startDevMachineById` | `zenith instances start-by-id` | `instances:start` | 规划中；HTTP 可按 Platform ID 启动本人开发机。 |
 | `stopDevMachineById` | `zenith instances stop-by-id` | `instances:stop` | 规划中；HTTP 可按 Platform ID 停止本人开发机。 |
@@ -319,7 +319,9 @@ zenith storage sts --source-id "$SOURCE_ID" --duration-seconds 900 --credentials
 ```
 
 使用项目返回的稳定 ID，及该项目来源返回的 `id`；不要用名称或物理桶名替代。
-Token 需 `projects:read` 读取我的项目，`storage sts` 签发临时凭据还需三项存储范围和现有整桶读写授权。
+Token 需 `projects:read` 读取我的项目，`storage sts` 签发临时凭据还需三项存储范围和所选桶或目录的读写授权。
+API 4.4.0 支持目录凭据：从来源列表选择个人目录或 `public` 的 `source_id`，分别签发。
+返回的 `path_prefix` 是授权范围，存储 SDK 对象路径须包含此前缀。资源区5 列举时须指定授权前缀；资源区10 目录凭据的 `can_list=false`，请用 `storage objects` 获取文件列表。
 凭据仅写入新建 0600 文件，不进入终端输出。不要将文件内容粘贴到 AI 对话。
 默认有效期 900 秒，最长 43200 秒，Token 需额外预留 60 秒有效期；撤销 Token 不会
 立即撤销已签发云凭据。签发不会自动重试。
